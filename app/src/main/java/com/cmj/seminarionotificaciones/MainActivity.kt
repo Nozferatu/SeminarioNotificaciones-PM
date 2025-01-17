@@ -28,6 +28,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.cmj.seminarionotificaciones.MainActivity.Companion.CHANNEL_ID
 import com.cmj.seminarionotificaciones.MainActivity.Companion.id
+import com.cmj.seminarionotificaciones.core.navigation.NavigationWrapper
 import com.cmj.seminarionotificaciones.ui.theme.SeminarioNotificacionesPMTheme
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -46,12 +47,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SeminarioNotificacionesPMTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Inicio(
-                        modifier = Modifier.padding(innerPadding),
-                        applicationContext
-                    )
-                }
+                NavigationWrapper()
             }
         }
     }
@@ -68,63 +64,6 @@ class MainActivity : ComponentActivity() {
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
-        }
-    }
-}
-
-@Composable
-fun Inicio(modifier: Modifier = Modifier, contexto: Context) {
-    val intent = Intent(contexto, MainActivity::class.java).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-    }
-
-    val pendingIntent = PendingIntent.getActivity(
-        contexto,
-        0,
-        intent,
-        PendingIntent.FLAG_IMMUTABLE
-    )
-
-    val actionIntent = Intent(contexto, MainActivity::class.java).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-    }
-
-    val actionPendingIntent = PendingIntent.getActivity(
-        contexto,
-        0,
-        actionIntent,
-        PendingIntent.FLAG_IMMUTABLE
-    )
-
-    val builder = NotificationCompat.Builder(contexto, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
-        .setContentTitle("¿Hola qué tal?")
-        .setContentText("Pasa para saludarte desde esta notificación. Mi id es $id")
-        .setPriority(NotificationCompat.PRIORITY_HIGH)
-        .setContentIntent(pendingIntent)
-        .addAction(R.drawable.ic_launcher_foreground, "Ir a la actividad", actionPendingIntent)
-        .setAutoCancel(true)
-
-    Column(modifier = modifier
-        .fillMaxWidth()
-        .padding(vertical = 10.dp, horizontal = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Button(
-            onClick = {
-                with(NotificationManagerCompat.from(contexto)){
-                    if (ActivityCompat.checkSelfPermission(
-                            contexto,
-                            Manifest.permission.POST_NOTIFICATIONS
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        return@Button
-                    }
-                    notify(id.incrementAndGet(), builder.build())
-                }
-            }
-        ) {
-            Text("Crear notificación")
         }
     }
 }
