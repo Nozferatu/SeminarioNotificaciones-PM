@@ -8,17 +8,15 @@ import androidx.navigation.compose.rememberNavController
 import com.cmj.seminarionotificaciones.core.navigation.screens.Ejercicio1
 
 @Composable
-fun NavigationWrapper(actividadInicial: String) {
+fun NavigationWrapper(actividadSeleccionada: String) {
     val contexto = LocalContext.current
     val navController = rememberNavController()
-
-    if(actividadInicial.isNotEmpty()){
-        when(actividadInicial){
-            "Ejercicio" -> {navController.navigate(Ejercicio1)}
-        }
+    val startDestination: Any = when(actividadSeleccionada){
+        "Ejercicio1" -> { Ejercicio1 }
+        else -> { Inicio }
     }
 
-    NavHost(navController = navController, startDestination = Inicio){
+    NavHost(navController = navController, startDestination = startDestination){
         composable<Inicio>{
             Inicio { navController.navigate(Ejercicio1) }
         }

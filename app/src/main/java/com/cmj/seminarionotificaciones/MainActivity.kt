@@ -13,8 +13,6 @@ import com.cmj.seminarionotificaciones.ui.theme.SeminarioNotificacionesPMTheme
 import java.util.concurrent.atomic.AtomicInteger
 
 class MainActivity : ComponentActivity() {
-    private lateinit var actividadIntent: String
-
     companion object {
         val APP_ID = "com.cmj.seminarionotificaciones"
         val CHANNEL_ID = "${APP_ID}_69"
@@ -27,11 +25,9 @@ class MainActivity : ComponentActivity() {
 
         createNotificationChannel()
 
-        actividadIntent = intent.getStringExtra("actividad") ?: ""
-
         setContent {
             SeminarioNotificacionesPMTheme {
-                NavigationWrapper(actividadIntent)
+                NavigationWrapper(intent.action ?: "")
             }
         }
     }

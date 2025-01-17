@@ -40,7 +40,7 @@ fun Ejercicio1(modifier: Modifier = Modifier, contexto: Context) {
         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
     }
 
-    actionIntent.putExtra("actividad", "Ejercicio1")
+    actionIntent.setAction("Ejercicio1")
 
     val actionPendingIntent = PendingIntent.getActivity(
         contexto,
