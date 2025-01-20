@@ -1,7 +1,10 @@
 package com.cmj.seminarionotificaciones.core.navigation.screens
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -14,7 +17,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.ArrowDropDown
@@ -38,18 +43,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.BigPictureStyle
+import androidx.core.app.NotificationManagerCompat
 import coil.compose.AsyncImage
 import com.cmj.seminarionotificaciones.MainActivity.Companion.CHANNEL_ID
+import com.cmj.seminarionotificaciones.MainActivity.Companion.id
 import com.cmj.seminarionotificaciones.R
 
 @Composable
 fun Ejercicio3(modifier: Modifier = Modifier, contexto: Context) {
+    val scrollState = rememberScrollState()
+
     val builder = NotificationCompat.Builder(contexto, CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
-        .addAction(R.drawable.ic_launcher_foreground, "Compartir", null)
-        .addAction(R.drawable.ic_launcher_foreground, "Borrar", null)
         .setAutoCancel(true)
 
     val modifierInput = Modifier
@@ -59,10 +68,11 @@ fun Ejercicio3(modifier: Modifier = Modifier, contexto: Context) {
     val iconos = listOf("Icono 1", "Icono 2")
 
     var titulo by rememberSaveable { mutableStateOf("") }
-    var texto by rememberSaveable { mutableStateOf("") }
+    var contenido by rememberSaveable { mutableStateOf("") }
     var iconoElegido by rememberSaveable { mutableStateOf("") }
 
-    var cantidadBotones = remember { mutableIntStateOf(1) }
+    val cantidadBotones = remember { mutableIntStateOf(1) }
+    var nombreBotones by rememberSaveable { mutableStateOf("") }
 
     var uriImagen by remember { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(contract =
@@ -73,7 +83,8 @@ fun Ejercicio3(modifier: Modifier = Modifier, contexto: Context) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 30.dp, horizontal = 20.dp),
+            .padding(vertical = 30.dp, horizontal = 20.dp)
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
@@ -85,9 +96,9 @@ fun Ejercicio3(modifier: Modifier = Modifier, contexto: Context) {
 
         OutlinedTextField(
             modifier = modifierInput,
-            value = texto,
-            onValueChange = { texto = it },
-            label = { Text("Texto") }
+            value = contenido,
+            onValueChange = { contenido = it },
+            label = { Text("Contenido") }
         )
 
         Spinner("Selecciona el icono", iconos){
@@ -99,7 +110,7 @@ fun Ejercicio3(modifier: Modifier = Modifier, contexto: Context) {
         )
         Row(modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp, horizontal = 20.dp),
+            .padding(vertical = 5.dp, horizontal = 20.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
 
@@ -113,9 +124,18 @@ fun Ejercicio3(modifier: Modifier = Modifier, contexto: Context) {
             Text(cantidadBotones.intValue.toString(), fontSize = 20.sp)
 
             Button(
-                onClick = { cantidadBotones.intValue++ }
+                onClick = {
+                    if(cantidadBotones.intValue < 3) cantidadBotones.intValue++
+                }
             ) { Icon(imageVector = Icons.Default.Add, "") }
         }
+
+        OutlinedTextField(
+            modifier = modifierInput,
+            value = nombreBotones,
+            onValueChange = { nombreBotones = it },
+            label = { Text("Nombre de los botones") }
+        )
 
         AsyncImage(
             modifier = Modifier
@@ -126,11 +146,48 @@ fun Ejercicio3(modifier: Modifier = Modifier, contexto: Context) {
             contentDescription = "Imagen de la notificación"
         )
 
-        Button(modifier = Modifier.padding(vertical = 20.dp),
+        Button(modifier = Modifier.padding(vertical = 5.dp),
             onClick = {
                 launcher.launch("image/*")
             }
         ) { Text("Escoger imagen") }
+
+        Button(modifier = Modifier.padding(vertical = 5.dp),
+            onClick = {
+                with(NotificationManagerCompat.from(contexto)) {
+                    if (ActivityCompat.checkSelfPermission(
+                            contexto,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        return@Button
+                    }
+
+                    builder.apply {
+                        setContentTitle(titulo)
+                        setContentText(contenido)
+                        setStyle(
+                            BigPictureStyle().bigPicture(
+                            MediaStore.Images.Media.getBitmap(contexto.contentResolver, uriImagen)
+                        ))
+
+                        if(cantidadBotones.intValue > 0){
+                            val nombreBotonesList = nombreBotones.split(",")
+                            for(i in 0..cantidadBotones.intValue){
+                                addAction(
+                                    R.drawable.ic_launcher_foreground,
+                                    nombreBotonesList.getOrNull(i) ?: "Nada",
+                                    null
+                                )
+                            }
+                        }
+
+                    }
+
+                    notify(id.incrementAndGet(), builder.build())
+                }
+            }
+        ) { Text("Enviar notificación") }
     }
 }
 
