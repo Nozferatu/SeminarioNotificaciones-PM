@@ -5,7 +5,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cmj.seminarionotificaciones.core.navigation.screens.Ejercicio1
+import com.cmj.seminarionotificaciones.core.navigation.screens.*
 
 @Composable
 fun NavigationWrapper(actividadSeleccionada: String) {
@@ -18,10 +18,13 @@ fun NavigationWrapper(actividadSeleccionada: String) {
 
     NavHost(navController = navController, startDestination = startDestination){
         composable<Inicio>{
-            Inicio { navController.navigate(Ejercicio1) }
+            Inicio(navController)
         }
         composable<Ejercicio1>{
             Ejercicio1(contexto = contexto)
+        }
+        composable<Ejercicio2>{
+            Ejercicio2(contexto = contexto)
         }
     }
 }

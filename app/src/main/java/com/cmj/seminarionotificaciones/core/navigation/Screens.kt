@@ -7,3 +7,6 @@ object Inicio
 
 @Serializable
 object Ejercicio1
+
+@Serializable
+object Ejercicio2

@@ -9,9 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 
 @Composable
-fun Inicio(irAEjercicio: (vista: Any) -> Unit){
+fun Inicio(navController: NavHostController){
     Column(modifier = Modifier
         .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -23,8 +24,12 @@ fun Inicio(irAEjercicio: (vista: Any) -> Unit){
         )
         Spacer(modifier = Modifier.weight(.2f))
         Button(
-            onClick = { irAEjercicio(Ejercicio1) }
+            onClick = { navController.navigate(Ejercicio1) }
         ) { Text("Ejercicio 1") }
+        Spacer(modifier = Modifier.weight(.2f))
+        Button(
+            onClick = { navController.navigate(Ejercicio2) }
+        ) { Text("Ejercicio 2") }
         Spacer(modifier = Modifier.weight(1f))
     }
 }
