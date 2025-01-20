@@ -30,6 +30,10 @@ fun Inicio(navController: NavHostController){
         Button(
             onClick = { navController.navigate(Ejercicio2) }
         ) { Text("Ejercicio 2") }
+        Spacer(modifier = Modifier.weight(.2f))
+        Button(
+            onClick = { navController.navigate(Ejercicio3) }
+        ) { Text("Ejercicio 3") }
         Spacer(modifier = Modifier.weight(1f))
     }
 }

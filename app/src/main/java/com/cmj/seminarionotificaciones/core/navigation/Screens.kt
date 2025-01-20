@@ -10,3 +10,6 @@ object Ejercicio1
 
 @Serializable
 object Ejercicio2
+
+@Serializable
+object Ejercicio3

@@ -26,5 +26,8 @@ fun NavigationWrapper(actividadSeleccionada: String) {
         composable<Ejercicio2>{
             Ejercicio2(contexto = contexto)
         }
+        composable<Ejercicio3>{
+            Ejercicio3(contexto = contexto)
+        }
     }
 }
