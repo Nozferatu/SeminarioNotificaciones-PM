@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -57,7 +58,6 @@ fun Ejercicio3(modifier: Modifier = Modifier, contexto: Context) {
     val scrollState = rememberScrollState()
 
     val builder = NotificationCompat.Builder(contexto, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setAutoCancel(true)
 
@@ -154,37 +154,51 @@ fun Ejercicio3(modifier: Modifier = Modifier, contexto: Context) {
 
         Button(modifier = Modifier.padding(vertical = 5.dp),
             onClick = {
-                with(NotificationManagerCompat.from(contexto)) {
-                    if (ActivityCompat.checkSelfPermission(
-                            contexto,
-                            Manifest.permission.POST_NOTIFICATIONS
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        return@Button
-                    }
-
-                    builder.apply {
-                        setContentTitle(titulo)
-                        setContentText(contenido)
-                        setStyle(
-                            BigPictureStyle().bigPicture(
-                            MediaStore.Images.Media.getBitmap(contexto.contentResolver, uriImagen)
-                        ))
-
-                        if(cantidadBotones.intValue > 0){
-                            val nombreBotonesList = nombreBotones.split(",")
-                            for(i in 0..cantidadBotones.intValue){
-                                addAction(
-                                    R.drawable.ic_launcher_foreground,
-                                    nombreBotonesList.getOrNull(i) ?: "Nada",
-                                    null
-                                )
-                            }
+                if(iconoElegido.isNotEmpty()){
+                    with(NotificationManagerCompat.from(contexto)) {
+                        if (ActivityCompat.checkSelfPermission(
+                                contexto,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            return@Button
                         }
 
-                    }
+                        builder.apply {
+                            val resourceIcono = when(iconoElegido){
+                                "Icono 1" -> R.drawable.icono_1
+                                "Icono 2" -> R.drawable.icono_2
+                                else -> 0
+                            }
 
-                    notify(id.incrementAndGet(), builder.build())
+                            setSmallIcon(resourceIcono)
+                            setContentTitle(titulo)
+                            setContentText(contenido)
+                            setStyle(
+                                BigPictureStyle().bigPicture(
+                                MediaStore.Images.Media.getBitmap(contexto.contentResolver, uriImagen)
+                            ))
+
+                            if(cantidadBotones.intValue > 0){
+                                val nombreBotonesList = nombreBotones.split(",")
+                                for(i in 1..cantidadBotones.intValue){
+                                    addAction(
+                                        R.drawable.ic_launcher_foreground,
+                                        nombreBotonesList.getOrNull(i) ?: "Nada",
+                                        null
+                                    )
+                                }
+                            }
+
+                        }
+
+                        notify(id.incrementAndGet(), builder.build())
+                    }
+                }else{
+                    Toast.makeText(
+                        contexto,
+                        "Tiene que elegir el icono",
+                        Toast.LENGTH_SHORT).show()
                 }
             }
         ) { Text("Enviar notificación") }
